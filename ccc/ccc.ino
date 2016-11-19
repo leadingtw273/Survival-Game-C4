@@ -39,7 +39,7 @@ byte beePin = 10;  //蜂鳴器腳位
 //蜂鳴器
 void bee(){
   digitalWrite(beePin,HIGH);
-  delay(500);
+  delay(250);
   digitalWrite(beePin,LOW);
 }
 
@@ -170,6 +170,7 @@ void setPassword(){
 
  //遊戲結束
 void gameOver(){
+  digitalWrite(beePin,HIGH);
   while(acceptKey){
     do{
       char key = keypad.getKey();
@@ -183,6 +184,7 @@ void gameOver(){
       draw(lineA,lineB);
     }while( u8g.nextPage() );
   }
+  digitalWrite(beePin,LOW);
   acceptKey = true;
   setPassword();
 }
@@ -212,7 +214,7 @@ void loop() {
     }
     Serial.println(clockTime);
   
-    if((millis()/1000 - tempTime) >= clockTime){
+    if((millis()/1000 - tempTime)*2 >= clockTime){
       bee();
       tempTime = millis()/1000;
     }
