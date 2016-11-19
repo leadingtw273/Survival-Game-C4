@@ -127,8 +127,8 @@ void pass(){
             acceptKey = false;
         }
       }
-      lineA = "password correct!!";
-      lineB = "success!!!!!!!!!!!!!!!!!!!!!!!!!";
+      lineA = "password correct";
+      lineB = "success!!!!!!!!!";
       draw(lineA,lineB);
     }while( u8g.nextPage() );
   }
@@ -140,7 +140,7 @@ void pass(){
 void setPassword(){
   passcode = "";
   Serial.print("Setting passwoad... ");
-  lineA = "Setting passwoad...";
+  lineA = "Setting passwoad";
   lineB = "PIN:";
   while(acceptKey){
     do{
@@ -179,7 +179,7 @@ void gameOver(){
         }
       }
       lineA = "time out!!!!!";
-      lineB = "fail........................";
+      lineB = "fail.........";
       draw(lineA,lineB);
     }while( u8g.nextPage() );
   }
