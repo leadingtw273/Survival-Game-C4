@@ -93,6 +93,7 @@ void setTimeRange(){
         settime = "";
         lineB = "SEC:";
       } else if (key == 'D') {  // 確定輸入時間
+        tempTime = millis();
         strTime = millis()/1000;
         totalTime = settime.toInt();
         lineA = "Time set!";
@@ -179,9 +180,9 @@ void gameOver(){
 
 void clear_LCD(){
   lcd.setCursor(0, 0); // 設定游標位置在第一行行首
-  lcd.print("                          ");
+  lcd.print("                               ");
   lcd.setCursor(0, 1); // 設定游標位置在第二行行首
-  lcd.print("                          ");
+  lcd.print("                               ");
 }
 
 void show_LCD(){
@@ -203,6 +204,9 @@ void setup() {
 
 void loop() {
 
+  Serial.println("lastTime: " + lastTime);
+  Serial.println("clockTime: " + clockTime);
+    
   //draw(A,B)
   while(acceptKey){
   
@@ -224,15 +228,17 @@ void loop() {
       
     lastTime = totalTime - (millis()/1000 - strTime);
     
-    for(int x = 0 ; x <= total - 1; x++){
+    for(int x = 9 ; x >= 0; x--){
       if(lastTime > timeRange[x]){
         clockTime = timeBee[x+1];
+        break;
       }else if(lastTime < timeRange[0]){
         clockTime = timeBee[0];
       }
     }
-
-    if((millis() - tempTime) >= clockTime){
+    
+    int timeDiff = millis() - tempTime ;
+    if(timeDiff >= clockTime){
       bee();
       tempTime = millis();
     }
