@@ -15,8 +15,8 @@ char keymap[KEY_ROWS][KEY_COLS] = {
   {'0', '1', '4', '7'}
 };
 
-byte rowPins[KEY_ROWS] = {6, 7, 8, 9}; //Rows 0 to 3
-byte colPins[KEY_COLS] = {21, 20, 19, 18}; //Columns 0 to 3
+byte rowPins[KEY_ROWS] = {2, 3, 4, 5}; //Rows 0 to 3
+byte colPins[KEY_COLS] = {6, 7, 8, 9}; //Columns 0 to 3
 
 Keypad keypad = Keypad(makeKeymap(keymap), rowPins, colPins, KEY_ROWS, KEY_COLS);
 
@@ -34,15 +34,15 @@ int strTime = 0;
 int totalTime = 0;
 int clockTime = 0;
 int tempTime = 0;
-int lastTime = 0;
+int lastTime = 0; 
 String settime = "";
 
-byte beePin = 10;  //蜂鳴器腳位
+byte beePin = 13;  //蜂鳴器腳位
 
 //蜂鳴器
 void bee(){
   digitalWrite(beePin,HIGH);
-  delay(500);
+  myDelay(500);
   digitalWrite(beePin,LOW);
 }
 void bee(int d){
@@ -113,6 +113,33 @@ void setTimeRange(){
   
 }
 
+void keyINPass(){
+  
+    char key = keypad.getKey();
+    // 若目前接受用戶輸入，而且有新的字元輸入…
+    if (acceptKey && key != NO_KEY) {
+      clear_LCD();
+      if (key == 'C') {   // 清除畫面
+        inputCode = "";
+        lineB = "PIN: ";
+      } else if (key == 'D') {  // 比對輸入密碼
+        acceptKey = false;
+        checkPinCode();
+      } else {
+        inputCode += key;  // 儲存用戶的按鍵字元
+        lineB = "PIN: " + inputCode;
+      }
+    }
+    
+    lastTime = totalTime - (millis()/1000 - strTime);
+        
+    String str = String(lastTime);
+    lineA = "Time... " + str + " "  ;
+    
+    show_LCD();
+    
+}
+
 // 顯示「歡迎光臨」後，重設LCD顯示文字和輸入狀態。
 void resetLocker() {
   lineA = "Time... ";
@@ -132,7 +159,7 @@ void checkPinCode() {
   } else {
     lineB = "***WRONG!!***";    
     show_LCD();
-    delay(500); 
+    delay(250); 
     clear_LCD();
     resetLocker();
   }    
@@ -140,6 +167,7 @@ void checkPinCode() {
 
 //密碼通過顯示
 void pass(){
+  digitalWrite(beePin,LOW);
   lineA = "password correct";
   lineB = "success!!!!!!!!!";
   while(acceptKey){
@@ -192,6 +220,14 @@ void show_LCD(){
   lcd.print(lineB);
 }
 
+void myDelay(unsigned long duration){
+  unsigned long start = millis();
+  
+  while(((millis() - start) <= duration) && acceptKey){
+    keyINPass();
+  }
+}
+
 void setup() {
   Serial.begin(9600);
 
@@ -207,7 +243,6 @@ void loop() {
   Serial.println("lastTime: " + lastTime);
   Serial.println("clockTime: " + clockTime);
     
-  //draw(A,B)
   while(acceptKey){
   
     char key = keypad.getKey();
