@@ -10,10 +10,10 @@ LiquidCrystal_I2C lcd(0x3F,16,2);
 
 // 設置按鍵模組
 char keymap[KEY_ROWS][KEY_COLS] = {
-  {'F', 'E', 'D', 'C'},
-  {'B', '3', '6', '9'},
-  {'A', '2', '5', '8'},
-  {'0', '1', '4', '7'}
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
 };
 
 byte rowPins[KEY_ROWS] = {2, 3, 4, 5}; //Rows 0 to 3
@@ -28,9 +28,9 @@ String lineA = "",lineB = ""; // 顯示內容
 
 //計時
 //1,2,3,5,8,13,21,34,55,89
-int timeRange[] = {5,10,20,40,80,160,320,640,1280,2560};
+int timeRange[] = {10,20,40,80,160,320,640,1280,2560,5120};
 //int timeBee[]   = {50,100,300,500,1000,2000,3000,5000,8000,12000,17000};
-int timeBee[]   = {50,100,150,250,400,650,1050,1700,2750,4450,7200};
+int timeBee[]   = {100,150,250,400,650,1050,1700,2750,4450,7200,11650};
 int x = 2;
 int total = (int)sizeof(timeRange)/4;
 int strTime = 0;
@@ -40,13 +40,19 @@ int tempTime = 0;
 int lastTime = 0; 
 String settime = "";
 
-byte beePin = 13;  //蜂鳴器腳位
+const int speaker=13;  //蜂鳴器腳位
 
 //蜂鳴器
 void bee(int detime){
-  digitalWrite(beePin,HIGH);
+  tone(speaker,2000);
   myDelay(detime);
-  digitalWrite(beePin,LOW);
+  noTone(speaker);
+}
+
+void bee(){
+  tone(speaker,2000);
+  delay(100);
+  noTone(speaker);
 }
 
 //設定密碼
@@ -60,6 +66,7 @@ void setPassword(){
     Serial.println(key);
     if (acceptKey && key != NO_KEY) {
       clear_LCD();
+      bee();
       if (key == 'C') {   // 清除畫面
         passcode = "";
         lineB = "PIN:";
@@ -89,6 +96,7 @@ void setTimeRange(){
     char key = keypad.getKey();
     if(acceptKey && key != NO_KEY){
       clear_LCD();
+      bee();
       if (key == 'C') {   // 清除畫面
         settime = "";
         lineB = "SEC:";
@@ -167,13 +175,25 @@ void checkPinCode() {
 
 //密碼通過顯示
 void pass(){
-  digitalWrite(beePin,LOW);
+  delay(100);
+  tone(speaker,1000);
+  delay(200);
+  noTone(speaker);
+  delay(200);
+  tone(speaker,2000);
+  delay(200);
+  noTone(speaker);
+  delay(200);
+  tone(speaker,1000);
+  delay(200);
+  noTone(speaker);
   lineA = "password correct";
   lineB = "success!!!!!!!!!";
   while(acceptKey){
     char key = keypad.getKey();
     if(acceptKey && key != NO_KEY){
       if(key == 'D'){
+          bee();
           acceptKey = false;
       }
     }
@@ -189,12 +209,13 @@ void pass(){
 void gameOver(){
   lineA = "time out!!!!!";
   lineB = "fail.........";
-  digitalWrite(beePin,HIGH);
+  tone(speaker,2000);
   while(acceptKey){
     char key = keypad.getKey();
     if(acceptKey && key != NO_KEY){
       if(key == 'D'){
-          digitalWrite(beePin,LOW);
+          bee();
+          noTone(speaker);
           acceptKey = false;
       }
     }
@@ -230,8 +251,6 @@ void myDelay(unsigned long duration){
 
 void setup() {
   Serial.begin(9600);
-
-  pinMode(beePin,OUTPUT);
   
   lcd.begin();// initialize the lcd 
    
